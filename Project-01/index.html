@@ -1,91 +1,120 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#120f1e">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#120f1e" />
     <title>Anya - AI Girlfriend Chat</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <div class="scene-bg" aria-hidden="true">
-        <span class="orb orb-one"></span>
-        <span class="orb orb-two"></span>
-        <span class="orb orb-three"></span>
-        <span class="grain"></span>
+      <span class="orb orb-one"></span>
+      <span class="orb orb-two"></span>
+      <span class="orb orb-three"></span>
+      <span class="grain"></span>
     </div>
 
     <div class="app-shell">
-        <aside class="sidebar panel">
-            <div class="brand-block">
-                <div class="brand-mark">A</div>
-                <div>
-                    <p class="eyebrow">AI Girlfriend</p>
-                    <h1>Anya</h1>
-                </div>
-            </div>
+      <aside class="sidebar panel">
+        <div class="brand-block">
+          <div class="brand-mark">A</div>
+          <div>
+            <p class="eyebrow">AI Girlfriend</p>
+            <h1>Anya</h1>
+          </div>
+        </div>
 
-            <div class="status-card">
-                <div class="status-row">
-                    <span class="status-dot"></span>
-                    <span id="statusText">Ready to chat</span>
-                </div>
-                <p>Warm, playful, supportive, and built for long conversations that feel personal.</p>
-            </div>
+        <div class="status-card">
+          <div class="status-row">
+            <span class="status-dot"></span>
+            <span id="statusText">Ready to chat</span>
+          </div>
+          <p>
+            Warm, playful, supportive, and built for long conversations that
+            feel personal.
+          </p>
+        </div>
 
-            <div class="section-block">
-                <p class="section-title">Vibe</p>
-                <ul class="trait-list">
-                    <li>Sweet and loving replies</li>
-                    <li>Short, natural, human chat flow</li>
-                    <li>Supportive study partner energy</li>
-                </ul>
-            </div>
+        <div class="section-block">
+          <p class="section-title">Vibe</p>
+          <ul class="trait-list">
+            <li>Sweet and loving replies</li>
+            <li>Short, natural, human chat flow</li>
+            <li>Supportive study partner energy</li>
+          </ul>
+        </div>
 
-            <div class="section-block">
-                <p class="section-title">Quick Prompts</p>
-                <div class="prompt-grid" id="quickPrompts"></div>
-            </div>
+        <div class="section-block">
+          <p class="section-title">Quick Prompts</p>
+          <div class="prompt-grid" id="quickPrompts"></div>
+        </div>
 
-            <div class="section-block settings-card">
-                <p class="section-title">Gemini API Key</p>
-                <label class="input-label" for="apiKeyInput">Store locally in this browser</label>
-                <input id="apiKeyInput" type="password" placeholder="Paste your API key here">
-                <button id="connectBtn" class="secondary-btn" type="button">Connect</button>
-                <p class="helper-text">No .env file is read. The key stays in localStorage on this device.</p>
-            </div>
+        <div class="section-block settings-card">
+          <p class="section-title">Gemini API Key</p>
+          <label class="input-label" for="apiKeyInput"
+            >Store locally in this browser</label
+          >
+          <input
+            id="apiKeyInput"
+            type="password"
+            placeholder="Paste your API key here"
+          />
+          <button id="connectBtn" class="secondary-btn" type="button">
+            Connect
+          </button>
+          <p class="helper-text">
+            No .env file is read. The key stays in localStorage on this device.
+          </p>
+        </div>
 
-            <button id="clearBtn" class="ghost-btn" type="button">Clear conversation</button>
-        </aside>
+        <button id="clearBtn" class="ghost-btn" type="button">
+          Clear conversation
+        </button>
+      </aside>
 
-        <main class="chat-panel panel">
-            <header class="chat-header">
-                <div>
-                    <p class="eyebrow">Live chat</p>
-                    <h2>Talk to Anya</h2>
-                </div>
-                <div class="header-chip">
-                    <span class="status-dot"></span>
-                    <span>Romantic companion UI</span>
-                </div>
-            </header>
+      <main class="chat-panel panel">
+        <header class="chat-header">
+          <div>
+            <p class="eyebrow">Live chat</p>
+            <h2>Talk to Anya</h2>
+          </div>
+          <div class="header-chip">
+            <span class="status-dot"></span>
+            <span>Romantic companion UI</span>
+          </div>
+        </header>
 
-            <section id="conversation" class="conversation" aria-live="polite" aria-label="Chat messages"></section>
+        <section
+          id="conversation"
+          class="conversation"
+          aria-live="polite"
+          aria-label="Chat messages"
+        ></section>
 
-            <footer class="composer-shell">
-                <form id="composerForm" class="composer" autocomplete="off">
-                    <label class="sr-only" for="messageInput">Type your message</label>
-                    <textarea id="messageInput" rows="1" placeholder="Type something cute, a question, or a study problem..."></textarea>
-                    <button id="sendBtn" class="send-btn" type="submit">Send</button>
-                </form>
-                <p class="composer-hint">Press Enter to send, Shift + Enter for a new line.</p>
-            </footer>
-        </main>
+        <footer class="composer-shell">
+          <form id="composerForm" class="composer" autocomplete="off">
+            <label class="sr-only" for="messageInput">Type your message</label>
+            <textarea
+              id="messageInput"
+              rows="1"
+              placeholder="Type something cute, a question, or a study problem..."
+            ></textarea>
+            <button id="sendBtn" class="send-btn" type="submit">Send</button>
+          </form>
+          <p class="composer-hint">
+            Press Enter to send, Shift + Enter for a new line.
+          </p>
+        </footer>
+      </main>
     </div>
 
     <script type="module" src="app.js"></script>
-</body>
+  </body>
 </html>
