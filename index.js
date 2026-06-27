@@ -1,40 +1,56 @@
+//Day-2
+
+//for multiple messages sending:
+
+// import { GoogleGenAI } from "@google/genai";
+
+// const ai = new GoogleGenAI({
+//   apiKey: process.env.GEMINI_API_KEY,
+// });
+
+// async function main() {
+//   const chat = ai.chats.create({
+//     model: "gemini-2.5-flash",
+//   });
+
+//   await chat.sendMessage({
+//     message: "My name is Guddu.",
+//   });
+
+//   const response = await chat.sendMessage({
+//     message: "What is my name?",
+//   });
+
+//   console.log(response.text);
+// }
+
+// main();
+
+//for single message :
 import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({
-  apiKey: "AIzaSyAJr1nTRf37LLFruLaUIA3qT5z9xsXUWeU",
+  apiKey: process.env.GEMINI_API_KEY,
 });
 
 async function main() {
-  const interaction = await ai.interactions.create({
+  const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
-    input: [
-      {
-        role: "user",
-        parts: [{ text: "what is my name?" }],
-      },
-      {
-        role: "model",
-        parts: [{ text: "I don't know your name. Can you tell me?" }],
-      },
-      {
-        role: "user",
-        parts: [{ text: "My name is Guddu." }],
-      },
-      {
-        role: "model",
-        parts: [{ text: "Nice to meet you, Guddu!" }],
-      },
-      {
-        role: "user",
-        parts: [{ text: "What is my name?" }],
-      },
-    ],
+    contents: "what is Trie in dsa?",
   });
-  console.log(interaction.output_text);
+
+  console.log(response.text);
 }
 
 main();
+// import { GoogleGenAI } from "@google/genai";
 
+// const ai = new GoogleGenAI({
+//   apiKey: process.env.GEMINI_API_KEY,
+// });
 
-//readline sync
-//history auto save
+// const interaction = await ai.interactions.create({
+//   model: "gemini-3.5-flash",
+//   input: "Explain how AI works in a few words",
+// });
+// console.log(interaction.output_text);
