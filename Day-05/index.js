@@ -80,7 +80,12 @@ async function runAgent() {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: History,
-      config: { tools },
+
+      config: {
+        tools,
+        systemInstruction: `You are a helpful assistant that can provide information about crypto currency and weather information. You can call the tools to get the required information. If you need to get information about crypto currency, use the get_crypto tool. If you need to get weather information, use the weatherInformation tool. Always provide accurate and relevant information based on the user's query.You can also give the answer that are not related to crypto 
+        and weather information.`,
+      },
     });
 
     if (response.functionCalls && response.functionCalls.length > 0) {
@@ -124,7 +129,7 @@ async function runAgent() {
 }
 
 while (true) {
-  const question = readlinesync.question("Ask your question: ");
+  const question =readlinesync.question("Ask your question: ");
   if (question.toLowerCase() === "exit") {
     break;
   }
