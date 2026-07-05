@@ -1,3 +1,4 @@
+//make my own cursor
 import { GoogleGenAI } from "@google/genai";
 import { exec } from "child_process";
 import os from "os";
@@ -106,6 +107,7 @@ async function buildWebsite() {
         role: "model",
         parts: [{ text: result.text }],
       });
+      break;
     }
   }
 }
