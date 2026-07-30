@@ -1,0 +1,2 @@
+https://github.com/Rohitnegi9/STRIKEGenAI/tree/main/Lecture18
+
