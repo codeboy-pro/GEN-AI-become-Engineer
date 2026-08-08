@@ -110,28 +110,28 @@ In short:
 
 ---
 
-## 4. File Map: What Each File Does
+## 4. File Map (update): What Each File Does
 
 ### Core setup
 
-- [2_config.js](/media/guddu/NewVolume/GEN%20AI/Day-18/2_config.js) sets up Neo4j, Pinecone, Gemini LLM, and Gemini embeddings in one place.
+- [2_config.js](/media/guddu/NewVolume/GEN%20AI/Day-19/2_config.js) sets up Neo4j, Pinecone, Gemini LLM, Gemini embeddings, and the shared connection close helper.
 
 ### Indexing pipeline
 
-- [7_runIndexing.js](/media/guddu/NewVolume/GEN%20AI/Day-18/7_runIndexing.js) runs the full indexing workflow.
-- [4_entityExtractor.js](/media/guddu/NewVolume/GEN%20AI/Day-18/4_entityExtractor.js) uploads the PDF and extracts structured movie entities.
-- [5_graphBuilder.js](/media/guddu/NewVolume/GEN%20AI/Day-18/5_graphBuilder.js) writes movie facts into Neo4j.
-- [6_vectorStore.js](/media/guddu/NewVolume/GEN%20AI/Day-18/6_vectorStore.js) creates embeddings and stores them in Pinecone.
+- [7_runIndexing.js](/media/guddu/NewVolume/GEN%20AI/Day-19/7_runIndexing.js) runs the full Day-19 indexing workflow.
+- [4_entityExtractor.js](/media/guddu/NewVolume/GEN%20AI/Day-19/4_entityExtractor.js) uploads the PDF to Gemini and extracts structured movie entities.
+- [5_graphBuilder.js](/media/guddu/NewVolume/GEN%20AI/Day-19/5_graphBuilder.js) writes movie facts into Neo4j.
+- [3_pdfParser.js](/media/guddu/NewVolume/GEN%20AI/Day-19/3_pdfParser.js) extracts raw PDF text for vector indexing.
+- [6_vectorStore.js](/media/guddu/NewVolume/GEN%20AI/Day-19/6_vectorStore.js) chunks parsed text, embeds it, and stores the vectors in Pinecone.
 
 ### Query pipeline
 
-- [13_runQuery.js](/media/guddu/NewVolume/GEN%20AI/Day-18/13_runQuery.js) is the CLI entry point for asking questions.
-- [9_queryClassifier.js](/media/guddu/NewVolume/GEN%20AI/Day-18/9_queryClassifier.js) routes the query type.
-- [10_queryPlanner.js](/media/guddu/NewVolume/GEN%20AI/Day-18/10_queryPlanner.js) converts factual questions into a JSON plan.
-- [8_cypherTemplates.js](/media/guddu/NewVolume/GEN%20AI/Day-18/8_cypherTemplates.js) turns the plan into safe read-only Cypher.
-- [11_factualHandler.js](/media/guddu/NewVolume/GEN%20AI/Day-18/11_factualHandler.js) handles graph/factual questions.
-- [12_similarityHandler.js](/media/guddu/NewVolume/GEN%20AI/Day-18/12_similarityHandler.js) handles movie recommendations.
-- [14_descriptiveHandler.js](/media/guddu/NewVolume/GEN%20AI/Day-18/14_descriptiveHandler.js) handles “who is X?” / “tell me about X” style questions.
+- [13_runQuery.js](/media/guddu/NewVolume/GEN%20AI/Day-19/13_runQuery.js) is the universal CLI entry point.
+- [9_entityResolver.js](/media/guddu/NewVolume/GEN%20AI/Day-19/9_entityResolver.js) extracts names from the query and resolves them in Neo4j first.
+- [10_queryClassifier.js](/media/guddu/NewVolume/GEN%20AI/Day-19/10_queryClassifier.js) classifies the query using resolved entity context.
+- [8_cypherTemplates.js](/media/guddu/NewVolume/GEN%20AI/Day-19/8_cypherTemplates.js) still protects the graph side with safe Cypher templates.
+- [11_graphHandler.js](/media/guddu/NewVolume/GEN%20AI/Day-19/11_graphHandler.js) handles factual, descriptive, and relationship queries in one place.
+- [12_similarityHandler.js](/media/guddu/NewVolume/GEN%20AI/Day-19/12_similarityHandler.js) handles hybrid similarity with Pinecone plus Neo4j filtering.
 
 ### Commands
 
@@ -198,7 +198,7 @@ It is a mathematical representation of the movie’s meaning.
 
 ### What goes into the embedding text
 
-[6_vectorStore.js](/media/guddu/NewVolume/GEN%20AI/Day-18/6_vectorStore.js) builds a clean summary like:
+[6_vectorStore.js](/media/guddu/NewVolume/GEN%20AI/Day-19/6_vectorStore.js) builds a clean summary like:
 
 - title
 - genres
@@ -230,23 +230,23 @@ This allows the recommendation handlers to reason over the same movie record wit
 
 ---
 
-## 7. Indexing Workflow: PDF To Searchable Knowledge
+## 7. Indexing Workflow (update): PDF To Searchable Knowledge
 
 This is the most important end-to-end pipeline in the project.
 
 ### Step 1: Run the indexing script
 
-[7_runIndexing.js](/media/guddu/NewVolume/GEN%20AI/Day-18/7_runIndexing.js) orchestrates everything.
+[7_runIndexing.js](/media/guddu/NewVolume/GEN%20AI/Day-19/7_runIndexing.js) orchestrates everything.
 
 It does three things in order:
 
-1. Extract entities from the PDF
-2. Build the Neo4j graph
-3. Build the Pinecone vector store
+1. Extract entities from the PDF with Gemini
+2. Build the Neo4j graph from the extracted entities
+3. Parse the PDF again for text chunks, then embed and store them in Pinecone
 
 ### Step 2: Upload the PDF once
 
-[4_entityExtractor.js](/media/guddu/NewVolume/GEN%20AI/Day-18/4_entityExtractor.js) uploads the PDF to Gemini Files API.
+[4_entityExtractor.js](/media/guddu/NewVolume/GEN%20AI/Day-19/4_entityExtractor.js) uploads the PDF to Gemini Files API.
 
 Why this matters:
 
@@ -275,13 +275,13 @@ If extraction is messy, both the graph and the vector store become noisy.
 
 ### Step 4: Build the graph
 
-[5_graphBuilder.js](/media/guddu/NewVolume/GEN%20AI/Day-18/5_graphBuilder.js) turns each JSON movie object into nodes and relationships.
+[5_graphBuilder.js](/media/guddu/NewVolume/GEN%20AI/Day-19/5_graphBuilder.js) turns each JSON movie object into nodes and relationships.
 
 This gives the system exact fact storage.
 
 ### Step 5: Build the vector store
 
-[6_vectorStore.js](/media/guddu/NewVolume/GEN%20AI/Day-18/6_vectorStore.js) creates a summary text for each movie, embeds it, and stores it in Pinecone.
+[6_vectorStore.js](/media/guddu/NewVolume/GEN%20AI/Day-19/6_vectorStore.js) parses the PDF, splits it into chunks, embeds each chunk, and stores the vectors in Pinecone.
 
 This gives the system semantic retrieval.
 
@@ -296,73 +296,73 @@ That is the heart of GraphRAG.
 
 ---
 
-## 8. Query Workflow: Question To Answer
+## 8. Query Workflow (update): Question To Answer
 
-When the user runs [13_runQuery.js](/media/guddu/NewVolume/GEN%20AI/Day-18/13_runQuery.js), the system follows this sequence:
+When the user runs [13_runQuery.js](/media/guddu/NewVolume/GEN%20AI/Day-19/13_runQuery.js), the system follows this sequence:
 
 1. Classify the question
 2. Route it to the right handler
 3. Fetch results from the right store
 4. Let Gemini explain the result naturally
 
-### A. Classification
+### A. Entity resolution first
 
-[9_queryClassifier.js](/media/guddu/NewVolume/GEN%20AI/Day-18/9_queryClassifier.js) decides whether the query is:
+[9_entityResolver.js](/media/guddu/NewVolume/GEN%20AI/Day-19/9_entityResolver.js) runs before everything else.
 
-- `factual`
-- `similarity`
-- `descriptive`
+It does two things:
+
+1. Extracts names from the user query
+2. Searches all Neo4j node types to resolve those names into labels and exact node names
 
 Examples:
 
-- “Movies directed by Nolan” → factual
+- “Nolan” → Director “Christopher Nolan”
+- “DiCaprio” → Actor “Leonardo DiCaprio”
+- “Action” → Genre “Action”
+
+This is the biggest Lecture 19 upgrade because the system now knows what the user is talking about before classifying the query.
+
+### B. Classification
+
+[10_queryClassifier.js](/media/guddu/NewVolume/GEN%20AI/Day-19/10_queryClassifier.js) decides whether the query is:
+
+- `graph`
+- `similarity`
+
+Examples:
+
+- “Movies directed by Nolan” → graph
+- “How is DiCaprio related to Nolan?” → graph
+- “Tell me about Inception” → graph
 - “Movies like Inception” → similarity
-- “Tell me about James Cameron” → descriptive
 
-This is the routing brain of the app.
+The important change is that factual, descriptive, and relationship questions are now all grouped into the graph path.
 
-### B. Factual path
+### C. Graph path
 
-If the query is factual, the system uses the graph.
+If the query is graph-based, the system uses Neo4j.
 
 Flow:
 
-1. Gemini creates a JSON query plan
-2. The plan is converted into safe Cypher
+1. Gemini creates a plan using resolved entity names
+2. The plan can be a normal traversal query, a describe query, or a path query
 3. Neo4j runs the query in read-only mode
-4. Gemini rewrites the raw rows into a normal answer
+4. Gemini formats the result into plain English
 
-This is where Neo4j shines, because the question depends on exact relationships.
+### D. Similarity path
 
-### C. Similarity path
-
-If the query is about recommendations, the system uses Pinecone.
+If the query is about recommendations, the system uses Pinecone plus Neo4j.
 
 Flow:
 
-1. Extract a target movie name if one exists
-2. Embed the movie title or the user’s description
-3. Query Pinecone for the closest matches
-4. Let Gemini rank the best recommendations and explain why
-
-This is where the vector DB shines, because the question is about meaning.
-
-### D. Descriptive path
-
-If the query is “Who is X?” or “Tell me about X?”, the system uses Pinecone metadata.
-
-Flow:
-
-1. Extract the entity name
-2. Embed the entity name
-3. Search Pinecone for related movie records
-4. Let Gemini summarize the result into a human-friendly description
-
-This is useful when the query is broader than a simple fact lookup.
+1. The movie entity is already resolved if it exists
+2. Pinecone finds candidate movies by vector similarity
+3. Neo4j checks genre or theme overlap
+4. Gemini ranks the final recommendations and explains them
 
 ---
 
-## 9. Why The Factual Path Needs A Plan
+## 9. Why The Graph Path Needs A Plan (update)
 
 You may wonder why the app does not directly send user text to Cypher.
 
@@ -381,6 +381,11 @@ This could mean several different traversals and filters.
 ### Solution
 
 Gemini first turns the question into a structured JSON plan.
+
+In Day-19, this plan can also include:
+
+- `describe` for “tell me about X” style questions
+- `path` for “how is A related to B?” style questions
 
 Example plan:
 
@@ -410,7 +415,7 @@ This is much safer than allowing raw LLM-generated Cypher.
 
 ## 10. Why The Template Layer Matters
 
-[8_cypherTemplates.js](/media/guddu/NewVolume/GEN%20AI/Day-18/8_cypherTemplates.js) is the safety net.
+[8_cypherTemplates.js](/media/guddu/NewVolume/GEN%20AI/Day-19/8_cypherTemplates.js) is the safety net.
 
 It only allows:
 
@@ -459,16 +464,16 @@ That works, but it is not yet the smartest possible routing strategy.
 
 ---
 
-## 12. Lecture 19: What Improved
+## 12. Lecture 19: What Improved (update)
 
-Lecture 19 builds on the same foundation but makes the system more intelligent before routing.
+Lecture 19 makes the system more grounded before routing.
 
-### Main upgrades described in the lecture
+### Main upgrades
 
-1. **Entity resolution first**
-2. **Better classification**
-3. **Unified graph handler**
-4. **Hybrid similarity handling**
+1. Entity resolution happens first.
+2. Classification uses resolved entity context.
+3. The graph side is unified into one handler.
+4. Similarity uses Pinecone plus Neo4j filtering.
 
 ### Why entity resolution matters
 
@@ -476,13 +481,10 @@ A user may say:
 
 - “Nolan”
 - “DiCaprio”
-- “The Dark Knight”
+- “Inception”
+- “Oscar”
 
-These are short, ambiguous mentions.
-
-Entity resolution tries to map those strings to the actual graph entities before classification or query execution.
-
-That makes the pipeline more grounded.
+These are short or ambiguous mentions, so the app resolves them against all graph node types before it decides what kind of query it is.
 
 ### Why this helps
 
@@ -490,28 +492,44 @@ It reduces ambiguity and improves answer quality.
 
 Example:
 
-- “show me Nolan movies” is easier to interpret if the system has already resolved “Nolan” to `Christopher Nolan`.
+- “show me Nolan movies” is easier to interpret if the system has already resolved “Nolan” to Director “Christopher Nolan”.
 
 ### Unified graph handling
 
-Lecture 19 combines factual, descriptive, and path-style graph questions into a single graph handler.
+[11_graphHandler.js](/media/guddu/NewVolume/GEN%20AI/Day-19/11_graphHandler.js) handles three graph query styles:
 
-That means the graph side becomes more reusable and less fragmented.
+- factual traversal queries
+- descriptive entity queries
+- relationship path queries
+
+That means the graph side is now one clean flow instead of multiple separate handlers.
 
 ### Hybrid similarity handling
 
-Lecture 19 also improves recommendations by mixing:
+[12_similarityHandler.js](/media/guddu/NewVolume/GEN%20AI/Day-19/12_similarityHandler.js) combines:
 
-- Pinecone similarity scores
-- Neo4j graph signals such as genre and theme overlap
+- Pinecone vector search
+- Neo4j genre and theme filtering
+- Gemini ranking and explanation
 
-This is important because embeddings alone can be too fuzzy.
-
-The graph can filter or strengthen the recommendations using structured facts.
+This is better than relying on embeddings alone because the graph can remove weak matches or strengthen strong ones.
 
 ---
 
-## 13. Lecture 18 vs Lecture 19
+## 13. Lecture 18 vs Lecture 19 (update)
+
+### Which is better?
+
+**Day-19 is better than Day-18** because it adds an extra reasoning layer before answering.
+
+Day-18 was already a solid GraphRAG baseline, but it decided the route too early and relied more on general intent. Day-19 first resolves what the user is actually talking about, then classifies the query with that grounded context, then sends it to a single cleaner graph path or a hybrid similarity path.
+
+That makes Day-19:
+
+- more accurate for names like “Nolan” or “DiCaprio”
+- better for descriptive and relationship questions
+- safer and cleaner on the graph side
+- stronger for recommendations because it mixes vector search with graph filtering
 
 ### Lecture 18
 
@@ -524,13 +542,16 @@ The graph can filter or strengthen the recommendations using structured facts.
 
 - adds entity resolution before routing
 - improves classification with grounded context
-- unifies graph handling
-- uses hybrid graph + vector reasoning for better recommendations
+- unifies graph handling into [11_graphHandler.js](/media/guddu/NewVolume/GEN%20AI/Day-19/11_graphHandler.js)
+- uses hybrid graph + vector reasoning in [12_similarityHandler.js](/media/guddu/NewVolume/GEN%20AI/Day-19/12_similarityHandler.js)
 
 ### Simple way to remember the difference
 
 - **Lecture 18:** “Route first, then answer.”
 - **Lecture 19:** “Resolve first, then route, then answer.”
+
+### Comparison table
+https://chatgpt.com/s/t_6a6dd1a0feac8191827a26d2bf7fdb29
 
 ---
 
