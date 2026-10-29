@@ -111,7 +111,10 @@ Examples:
 //
 // =====================================================================
 async function resolveEntity(entityName) {
-  const session = driver.session({ defaultAccessMode: "READ" });
+  const session = driver.session({
+    database: process.env.NEO4J_DATABASE,
+    defaultAccessMode: "READ",
+  });
   const matches = [];
 
   try {

@@ -27,7 +27,9 @@ import { driver } from "./2_config.js";
 
 // Insert ONE movie's entities and relationships
 async function insertMovieGraph(entity) {
-  const session = driver.session();
+  const session = driver.session({
+    database: process.env.NEO4J_DATABASE,
+  });
 
   try {
     // executeWrite wraps everything in a TRANSACTION (all-or-nothing)
@@ -105,7 +107,9 @@ async function buildGraph(entities) {
   console.log(`\n🔨 Building graph for ${entities.length} movies...\n`);
 
   // Step 1: Create indexes for fast MERGE
-  const session = driver.session();
+  const session = driver.session({
+    database: process.env.NEO4J_DATABASE,
+  });
   try {
     await session.run("CREATE INDEX IF NOT EXISTS FOR (m:Movie) ON (m.title)");
     await session.run(
@@ -131,7 +135,9 @@ async function buildGraph(entities) {
   }
 
   // Step 3: Print stats
-  const statsSession = driver.session();
+  const statsSession = driver.session({
+    database: process.env.NEO4J_DATABASE,
+  });
   try {
     const nodeCount = await statsSession.run(
       "MATCH (n) RETURN count(n) AS count",

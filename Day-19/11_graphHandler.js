@@ -165,7 +165,10 @@ EXAMPLES:
 //   → what awards did those movies win?
 // =====================================================================
 async function executeDescribe(label, name) {
-  const session = driver.session({ defaultAccessMode: "READ" });
+  const session = driver.session({
+    database: process.env.NEO4J_DATABASE,
+    defaultAccessMode: "READ",
+  });
 
   try {
     // Different queries depending on entity type
@@ -281,7 +284,10 @@ async function executeDescribe(label, name) {
 // We return the full path with all nodes and relationships
 // =====================================================================
 async function executePath(fromLabel, fromName, toLabel, toName) {
-  const session = driver.session({ defaultAccessMode: "READ" });
+  const session = driver.session({
+    database: process.env.NEO4J_DATABASE,
+    defaultAccessMode: "READ",
+  });
 
   try {
     const cypher = `
@@ -322,7 +328,10 @@ async function executeTemplateCypher(plan) {
   console.log(`   🔒 Cypher: ${cypher}`);
   console.log(`   🔒 Params:`, params);
 
-  const session = driver.session({ defaultAccessMode: "READ" });
+  const session = driver.session({
+    database: process.env.NEO4J_DATABASE,
+    defaultAccessMode: "READ",
+  });
 
   try {
     const result = await session.run(cypher, params);

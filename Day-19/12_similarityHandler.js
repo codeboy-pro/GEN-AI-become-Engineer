@@ -30,7 +30,10 @@ function extractTitleFromChunk(chunkText) {
  * Neo4j: Get genres of a specific movie.
  */
 async function getMovieGenres(movieTitle) {
-  const session = driver.session({ defaultAccessMode: "READ" });
+  const session = driver.session({
+    database: process.env.NEO4J_DATABASE,
+    defaultAccessMode: "READ",
+  });
   try {
     const result = await session.run(
       `MATCH (m:Movie)-[:BELONGS_TO]->(g:Genre)
@@ -48,7 +51,10 @@ async function getMovieGenres(movieTitle) {
  * Neo4j: Get themes of a specific movie.
  */
 async function getMovieThemes(movieTitle) {
-  const session = driver.session({ defaultAccessMode: "READ" });
+  const session = driver.session({
+    database: process.env.NEO4J_DATABASE,
+    defaultAccessMode: "READ",
+  });
   try {
     const result = await session.run(
       `MATCH (m:Movie)-[:EXPLORES]->(t:Theme)
@@ -67,7 +73,10 @@ async function getMovieThemes(movieTitle) {
  * at least one genre with the source genres.
  */
 async function filterByGenre(movieTitles, sourceGenres) {
-  const session = driver.session({ defaultAccessMode: "READ" });
+  const session = driver.session({
+    database: process.env.NEO4J_DATABASE,
+    defaultAccessMode: "READ",
+  });
   try {
     const result = await session.run(
       `MATCH (m:Movie)-[:BELONGS_TO]->(g:Genre)

@@ -19,7 +19,9 @@ async function testConnections() {
 
   // Test 1: Neo4j
   try {
-    const session = driver.session();
+    const session = driver.session({
+      database: process.env.NEO4J_DATABASE,
+    });
     const result = await session.run("RETURN 'Neo4j Connected!' AS message");
     console.log("✅ Neo4j:", result.records[0].get("message"));
     await session.close();

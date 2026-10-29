@@ -102,7 +102,9 @@ async function startCLI() {
         console.error("\n❌ Error:", err.message);
       }
 
-      ask();
+      if (!rl.closed) {
+        ask();
+      }
     });
   };
 
